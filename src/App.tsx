@@ -18,6 +18,8 @@ import { useRef, useState } from "react";
 import "./App.scss";
 import { LiveAPIProvider } from "./contexts/LiveAPIContext";
 import { PlumbingAnalyzer } from "./components/plumbing-analyzer/PlumbingAnalyzer";
+import { Header } from "./components/header/Header";
+import { FeaturedProducts } from "./components/featured-products/FeaturedProducts";
 import ControlTray from "./components/control-tray/ControlTray";
 import cn from "classnames";
 
@@ -27,36 +29,29 @@ if (typeof API_KEY !== "string") {
 }
 
 const host = "generativelanguage.googleapis.com";
-const uri = `wss://${host}/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContent`;
+const url = `wss://${host}/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContent`;
 
 function App() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [videoStream, setVideoStream] = useState<MediaStream | null>(null);
 
   return (
-    <div className="App">
-      <LiveAPIProvider url={uri} apiKey={API_KEY}>
-        <div className="streaming-console">
-          <main>
-            <div className="main-app-area">
+    <div className="app">
+      <LiveAPIProvider apiKey={API_KEY} url={url}>
+        <Header />
+        <main className="main-content">
+          <FeaturedProducts />
+          <section id="analyzer" className="analyzer-section">
+            <div className="analyzer-container">
               <PlumbingAnalyzer />
-              <video
-                className={cn("stream", {
-                  hidden: !videoRef.current || !videoStream,
-                })}
-                ref={videoRef}
-                autoPlay
-                playsInline
+              <ControlTray
+                videoRef={videoRef}
+                supportsVideo={true}
+                onVideoStreamChange={setVideoStream}
               />
             </div>
-
-            <ControlTray
-              videoRef={videoRef}
-              supportsVideo={true}
-              onVideoStreamChange={setVideoStream}
-            />
-          </main>
-        </div>
+          </section>
+        </main>
       </LiveAPIProvider>
     </div>
   );
