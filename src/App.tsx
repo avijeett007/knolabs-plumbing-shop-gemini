@@ -14,46 +14,28 @@
  * limitations under the License.
  */
 
-import { useRef, useState } from "react";
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import "./App.scss";
-import { LiveAPIProvider } from "./contexts/LiveAPIContext";
-import { PlumbingAnalyzer } from "./components/plumbing-analyzer/PlumbingAnalyzer";
 import { Header } from "./components/header/Header";
 import { FeaturedProducts } from "./components/featured-products/FeaturedProducts";
-import ControlTray from "./components/control-tray/ControlTray";
-import cn from "classnames";
-
-const API_KEY = process.env.REACT_APP_GEMINI_API_KEY as string;
-if (typeof API_KEY !== "string") {
-  throw new Error("set REACT_APP_GEMINI_API_KEY in .env");
-}
-
-const host = "generativelanguage.googleapis.com";
-const url = `wss://${host}/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContent`;
+import { KnoBotPage } from "./pages/KnoBotPage";
 
 function App() {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [videoStream, setVideoStream] = useState<MediaStream | null>(null);
-
   return (
-    <div className="app">
-      <LiveAPIProvider apiKey={API_KEY} url={url}>
+    <Router>
+      <div className="app">
         <Header />
-        <main className="main-content">
-          <FeaturedProducts />
-          <section id="analyzer" className="analyzer-section">
-            <div className="analyzer-container">
-              <PlumbingAnalyzer />
-              <ControlTray
-                videoRef={videoRef}
-                supportsVideo={true}
-                onVideoStreamChange={setVideoStream}
-              />
-            </div>
-          </section>
-        </main>
-      </LiveAPIProvider>
-    </div>
+        <Routes>
+          <Route path="/" element={
+            <main className="main-content">
+              <FeaturedProducts />
+            </main>
+          } />
+          <Route path="/knobot" element={<KnoBotPage />} />
+        </Routes>
+      </div>
+    </Router>
   );
 }
 

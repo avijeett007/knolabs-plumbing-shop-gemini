@@ -1,0 +1,31 @@
+.knobot-page {
+  min-height: 100vh;
+  background: #f5f5f5;
+  padding: 2rem;
+
+  .knobot-header {
+    max-width: 1200px;
+    margin: 0 auto 2rem;
+    text-align: center;
+    padding: 2rem;
+
+    h1 {
+      color: #1a237e;
+      margin-bottom: 1rem;
+    }
+
+    p {
+      color: #666;
+      font-size: 1.2rem;
+    }
+  }
+
+  .analyzer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+  }
+}
