@@ -1,8 +1,8 @@
 .header {
-  background: #1a237e;
-  color: white;
+  background: var(--gradient-primary);
+  color: var(--text-light);
   padding: 1rem 0;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   position: sticky;
   top: 0;
   z-index: 1000;
@@ -18,12 +18,13 @@
 
   .logo {
     text-decoration: none;
-    color: white;
+    color: var(--text-light);
 
     h1 {
       margin: 0;
       font-size: 1.8rem;
       font-weight: 700;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
     .tagline {
@@ -32,7 +33,7 @@
     }
 
     &:hover {
-      opacity: 0.9;
+      opacity: 0.95;
     }
   }
 
@@ -41,7 +42,7 @@
     gap: 2rem;
 
     a {
-      color: white;
+      color: var(--text-light);
       text-decoration: none;
       font-weight: 500;
       padding: 0.5rem 1rem;
@@ -49,11 +50,12 @@
       transition: all 0.2s;
 
       &:hover {
-        background: rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.15);
       }
 
       &.active {
         background: rgba(255, 255, 255, 0.2);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       }
     }
   }
