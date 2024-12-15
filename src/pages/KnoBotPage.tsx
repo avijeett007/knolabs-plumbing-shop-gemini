@@ -20,7 +20,24 @@ export function KnoBotPage() {
       </div>
       <LiveAPIProvider apiKey={API_KEY} url={url}>
         <div className="analyzer-container">
-          <PlumbingAnalyzer />
+          <div className="content-area">
+            <div className="video-container">
+              <video 
+                ref={videoRef}
+                autoPlay 
+                playsInline
+                muted
+                className={videoStream ? 'active' : ''}
+              />
+              {!videoStream && (
+                <div className="video-placeholder">
+                  <span className="material-symbols-outlined">videocam_off</span>
+                  <p>Camera is off</p>
+                </div>
+              )}
+            </div>
+            <PlumbingAnalyzer />
+          </div>
           <ControlTray
             videoRef={videoRef}
             supportsVideo={true}

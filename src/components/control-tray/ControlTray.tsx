@@ -1,8 +1,6 @@
 import cn from "classnames";
 import { memo, ReactNode, RefObject, useEffect, useRef, useState } from "react";
 import { useLiveAPIContext } from "../../contexts/LiveAPIContext";
-import { UseMediaStreamResult } from "../../hooks/use-media-stream-mux";
-import { useScreenCapture } from "../../hooks/use-screen-capture";
 import { useWebcam } from "../../hooks/use-webcam";
 import { AudioRecorder } from "../../lib/audio-recorder";
 import AudioPulse from "../audio-pulse/AudioPulse";
@@ -27,11 +25,11 @@ const MediaStreamButton = memo(
   ({ isStreaming, onIcon, offIcon, start, stop }: MediaStreamButtonProps) =>
     isStreaming ? (
       <button className="action-button" onClick={stop}>
-        <span className="material-symbols-outlined">{onIcon}</span>
+        <span className="material-symbols-outlined filled">{onIcon}</span>
       </button>
     ) : (
       <button className="action-button" onClick={start}>
-        <span className="material-symbols-outlined">{offIcon}</span>
+        <span className="material-symbols-outlined filled">{offIcon}</span>
       </button>
     ),
 );
@@ -42,9 +40,7 @@ function ControlTray({
   onVideoStreamChange = () => {},
   supportsVideo,
 }: ControlTrayProps) {
-  const videoStreams = [useWebcam(), useScreenCapture()];
-  const [activeVideoStream, setActiveVideoStream] = useState<MediaStream | null>(null);
-  const [webcam, screenCapture] = videoStreams;
+  const webcam = useWebcam();
   const [inVolume, setInVolume] = useState(0);
   const [audioRecorder] = useState(() => new AudioRecorder());
   const [muted, setMuted] = useState(false);
@@ -86,8 +82,9 @@ function ControlTray({
   }, [connected, client, muted, audioRecorder]);
 
   useEffect(() => {
-    if (videoRef.current) {
-      videoRef.current.srcObject = activeVideoStream;
+    if (videoRef.current && webcam.stream) {
+      videoRef.current.srcObject = webcam.stream;
+      onVideoStreamChange(webcam.stream);
     }
 
     let timeoutId = -1;
@@ -113,26 +110,13 @@ function ControlTray({
         timeoutId = window.setTimeout(sendVideoFrame, 1000 / 0.5);
       }
     }
-    if (connected && activeVideoStream !== null) {
+    if (connected && webcam.stream) {
       requestAnimationFrame(sendVideoFrame);
     }
     return () => {
       clearTimeout(timeoutId);
     };
-  }, [connected, activeVideoStream, client, videoRef]);
-
-  const changeStreams = (next?: UseMediaStreamResult) => async () => {
-    if (next) {
-      const mediaStream = await next.start();
-      setActiveVideoStream(mediaStream);
-      onVideoStreamChange(mediaStream);
-    } else {
-      setActiveVideoStream(null);
-      onVideoStreamChange(null);
-    }
-
-    videoStreams.filter((msr) => msr !== next).forEach((msr) => msr.stop());
-  };
+  }, [connected, webcam.stream, client, videoRef, onVideoStreamChange]);
 
   return (
     <section className="control-tray">
@@ -154,22 +138,20 @@ function ControlTray({
         </div>
 
         {supportsVideo && (
-          <>
-            <MediaStreamButton
-              isStreaming={screenCapture.isStreaming}
-              start={changeStreams(screenCapture)}
-              stop={changeStreams()}
-              onIcon="cancel_presentation"
-              offIcon="present_to_all"
-            />
-            <MediaStreamButton
-              isStreaming={webcam.isStreaming}
-              start={changeStreams(webcam)}
-              stop={changeStreams()}
-              onIcon="videocam_off"
-              offIcon="videocam"
-            />
-          </>
+          <MediaStreamButton
+            isStreaming={webcam.isStreaming}
+            start={async () => {
+              const stream = await webcam.start();
+              onVideoStreamChange(stream);
+              return stream;
+            }}
+            stop={() => {
+              webcam.stop();
+              onVideoStreamChange(null);
+            }}
+            onIcon="videocam_off"
+            offIcon="videocam"
+          />
         )}
         {children}
       </nav>
